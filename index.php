@@ -13,7 +13,7 @@
         <div class="title">
             <h1>Gestión de reserva del vehículo</h1>
         </div>
-        <form action="validar.php" method="post">
+        <form action="reserva.php" method="post">
             <div class="main">
                 <p>Nombre: <input type="text" name="nombre" /></p>
                 <p>Apellido: <input type="text" name="apellido" /></p>
@@ -23,7 +23,7 @@
                         <?php
                         include './db/usuarios_y_coches.php';
                         foreach ($coches as $coche) {
-                            echo '<option value="' . $coche["id"] . '">' . $coche["modelo"] . '</option>';
+                            echo "<option value='{$coche["id"]}'>{$coche["modelo"]}</option>";
                         }
                         ?>
                     </select>
