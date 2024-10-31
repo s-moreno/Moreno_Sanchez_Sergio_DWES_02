@@ -30,7 +30,8 @@ footer {
 }
 
 .title {
-  background-color: #81c3d7;
+  /* background-color: #81c3d7; */
+  background-color: #f7dc6f;
   display: flex;
   align-items: center;
   justify-content: center;
