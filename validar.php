@@ -38,19 +38,21 @@ function validarNIF($nif): bool
 }
 
 /**
- * Verifica que el usuario se encuentra en el array de usuarios
+ * Verifica que el usuario se encuentra en el array de usuarios.
+ * No discrimina entre mayúsculas y minúsculas.
  *
  * @param array $usuarios array de usuarios
  * @param array $usuarioForm array asociativo del usuario a verificar
  * @return bool
  */
-function userExist($usuarios, $usuarioForm): bool
+function userExist($usuarios, $inputForm): bool
 {
     foreach ($usuarios as $usuario) {
+        // Comparación de nombre y apellido sin tener en cuenta si se ha escrito en mayus o minus.
         if (
-            $usuario["dni"] === $usuarioForm["dni"] &&
-            $usuario["nombre"] === $usuarioForm["nombre"] &&
-            $usuario["apellido"] === $usuarioForm["apellido"]
+            $usuario["dni"] === trim($inputForm["dni"]) &&
+            mb_strtoupper($usuario["nombre"], 'UTF-8') === mb_strtoupper(trim($inputForm["nombre"]), 'UTF-8') &&
+            mb_strtoupper($usuario["apellido"], 'UTF-8') === mb_strtoupper(trim($inputForm["apellido"]), 'UTF-8')
         ) {
             return true;
         }
@@ -137,14 +139,14 @@ function validarReserva($coches, $inputForm): array
     if (empty($inputForm['nombre'])) {
         $validaciones["error"][] = "El campo 'nombre' no puede estar vácio.";
     } else {
-        $validaciones["correcto"][] = "Nombre: " . $inputForm['nombre'];
+        $validaciones["correcto"][] = "Nombre: " . ucfirst(mb_strtolower($inputForm["nombre"], "UTF-8"));
     }
 
     // Validar el apellido
     if (empty($inputForm['apellido'])) {
         $validaciones["error"][] = "El campo 'apellido' no puede estar vácio";
     } else {
-        $validaciones["correcto"][] = "Apellido: " . $inputForm['apellido'];
+        $validaciones["correcto"][] = "Apellido: " . ucfirst(mb_strtolower($inputForm["apellido"], "UTF-8"));
     }
 
     // Validar el DNI
@@ -234,10 +236,14 @@ function pintarReservaValida($inputForm, $coches): void
 {
     $id = $inputForm["idVehiculo"];
     $modelo = encontrarModeloPorID($id, $coches);
+    $nombre = ucfirst(mb_strtolower($inputForm["nombre"], "UTF-8"));
+    $apellido = ucfirst(mb_strtolower($inputForm["apellido"], "UTF-8"));
+    $extension = "png";
+
     $pintar = "<div class='info-reserva'>";
     $pintar .= "<h2>Reserva válida</h2>";
-    $pintar .= "<p>{$inputForm["nombre"]} {$inputForm["apellido"]}</p>";
-    $pintar .= "<img src='./img/{$id}.jpg' title='{$modelo}' alt='{$modelo}'>";
+    $pintar .= "<p>{$nombre} {$apellido}</p>";
+    $pintar .= "<img src='./img/{$id}.{$extension}' title='{$modelo}' alt='{$modelo}'>";
     $pintar .= "</div>";
 
     echo $pintar;
