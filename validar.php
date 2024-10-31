@@ -1,6 +1,5 @@
 <?php
 include './db/usuarios_y_coches.php';
-include 'reserva.php';
 
 // ----------- USUARIOS ------------
 
@@ -17,6 +16,7 @@ function letra_nif($dni): string
 
 /**
  * Verifica si un NIF estructuralmente es correcto
+ * No discrimina entre letra de control mayúscula o minúscula.
  *
  * @param string $nif número dni más letra
  * @return bool
@@ -39,7 +39,8 @@ function validarNIF($nif): bool
 
 /**
  * Verifica que el usuario se encuentra en el array de usuarios.
- * No discrimina entre mayúsculas y minúsculas.
+ * No discrimina entre mayúsculas y minúsculas del nombre,
+ * apellido o DNI.
  *
  * @param array $usuarios array de usuarios
  * @param array $usuarioForm array asociativo del usuario a verificar
@@ -47,12 +48,17 @@ function validarNIF($nif): bool
  */
 function userExist($usuarios, $inputForm): bool
 {
+    $dni = mb_strtoupper(trim($inputForm["dni"]), 'UTF-8');
+    $nombre = mb_strtoupper(trim($inputForm["nombre"]), 'UTF-8');
+    $apellido = mb_strtoupper(trim($inputForm["apellido"]), 'UTF-8');
+
     foreach ($usuarios as $usuario) {
         // Comparación de nombre y apellido sin tener en cuenta si se ha escrito en mayus o minus.
+
         if (
-            $usuario["dni"] === trim($inputForm["dni"]) &&
-            mb_strtoupper($usuario["nombre"], 'UTF-8') === mb_strtoupper(trim($inputForm["nombre"]), 'UTF-8') &&
-            mb_strtoupper($usuario["apellido"], 'UTF-8') === mb_strtoupper(trim($inputForm["apellido"]), 'UTF-8')
+            $usuario["dni"] === $dni &&
+            mb_strtoupper($usuario["nombre"], 'UTF-8') === $nombre &&
+            mb_strtoupper($usuario["apellido"], 'UTF-8') === $apellido
         ) {
             return true;
         }
