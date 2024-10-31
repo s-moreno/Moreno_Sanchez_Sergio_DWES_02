@@ -15,6 +15,7 @@
         </div>
         <div class="main">
             <?php
+            include 'validar.php';
             $validaciones = validarReserva($coches, $_POST);
             if (count($validaciones["error"]) != 0) {
                 pintarReservaNoValida($validaciones);
