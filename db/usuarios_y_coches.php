@@ -47,12 +47,12 @@ define(
     array(
       "nombre" => "Carlos",
       "apellido" => "López",
-      "dni" => "13579246Y"
+      "dni" => "13579246T"
     ),
     array(
       "nombre" => "Laura",
       "apellido" => "Martínez",
-      "dni" => "24681357T"
+      "dni" => "24681357B"
     )
   )
 );
