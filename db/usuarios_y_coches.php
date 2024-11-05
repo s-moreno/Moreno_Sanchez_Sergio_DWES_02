@@ -20,7 +20,7 @@ $coches = array(
     "modelo" => "Ford Escort RS1800",
     "disponible" => false,
     "fecha_inicio" => "2024-10-25",
-    "fecha_fin" => "2024-11-02"
+    "fecha_fin" => "2024-11-09"
   ),
   array(
     "id" => 4,
