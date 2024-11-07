@@ -123,6 +123,7 @@ footer {
   width: 50;
   padding: 10px 20px;
   cursor: pointer;
+  text-decoration: none;
 }
 
 .boton-color {

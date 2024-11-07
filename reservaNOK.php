@@ -32,7 +32,8 @@
             ?>
         </div>
         <div class="footer">
-            <button class="boton boton-color" onclick="window.location.href='index.php'">Volver</button>
+            <!-- <button class="boton boton-color" onclick="window.location.href='index.php'">Volver</button> -->
+            <a href="index.php" class="boton boton-color">Volver</a>
         </div>
     </div>
     <footer>
