@@ -16,7 +16,6 @@
         <div class="main">
             <?php
             session_start();
-            $modelo = $_SESSION['modeloCoche'];
             $nombre = $_SESSION['valido']['Nombre'];
             $apellido = $_SESSION['valido']['Apellido'];
             $idCoche = $_SESSION['vehiculo']['id'];
