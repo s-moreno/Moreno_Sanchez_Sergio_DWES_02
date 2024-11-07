@@ -13,7 +13,7 @@
         <div class="title">
             <h1>Gestión de reserva del vehículo</h1>
         </div>
-        <form action="reserva.php" method="post">
+        <form action="validarReserva.php" method="post">
             <div class="main">
                 <p>Nombre: <input type="text" name="nombre" /></p>
                 <p>Apellido: <input type="text" name="apellido" /></p>

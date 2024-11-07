@@ -14,14 +14,21 @@
             <h1>Gestión de reserva del vehículo</h1>
         </div>
         <div class="main">
+            <h2>Reserva no válida</h2>
             <?php
-            include 'validar.php';
-            $validaciones = validarReserva($coches, $_POST);
-            if (count($validaciones["error"]) != 0) {
-                pintarReservaNoValida($validaciones);
-            } else {
-                pintarReservaValida($_POST, $coches);
+            session_start();
+            $validos = $_SESSION['valido'];
+            $errores = $_SESSION['error'];
+
+            echo "<ul>";
+            foreach ($validos as $key => $value) {
+                echo "<li class='correcto'><strong>{$key}</strong>: {$value}</li>";
             }
+            echo "</ul><ul>";
+            foreach ($errores as $key => $value) {
+                echo "<li class='error'><strong>{$key}</strong>: {$value}</li>";
+            }
+            echo "</ul>";
             ?>
         </div>
         <div class="footer">

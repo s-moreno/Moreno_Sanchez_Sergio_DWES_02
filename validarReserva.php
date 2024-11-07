@@ -1,5 +1,11 @@
 <?php
-include './db/usuarios_y_coches.php';
+require './db/usuarios_y_coches.php';
+
+session_start();
+unset($_SESSION['valido']);
+unset($_SESSION['error']);
+unset($_SESSION['vehiculo']);
+
 
 // ----------- USUARIOS ------------
 
@@ -128,74 +134,6 @@ function validarCocheLibre($coches, $inputForm): bool
 }
 
 /**
- * Devuelve un array multidimensional con las validaciones
- * necesarias (correctas y erroneas).
- * @param  array $coches
- * @param  array $inputForm
- * @return array array asociativo multidimensional "correcto" y "error"
- */
-function validarReserva($coches, $inputForm): array
-{
-    $validaciones = [
-        "correcto" => [],
-        "error" => []
-    ];
-
-    // Validar el nombre
-    if (empty($inputForm['nombre'])) {
-        $validaciones["error"][] = "El campo 'nombre' no puede estar vácio.";
-    } else {
-        $validaciones["correcto"][] = "Nombre: " . ucfirst(mb_strtolower($inputForm["nombre"], "UTF-8"));
-    }
-
-    // Validar el apellido
-    if (empty($inputForm['apellido'])) {
-        $validaciones["error"][] = "El campo 'apellido' no puede estar vácio";
-    } else {
-        $validaciones["correcto"][] = "Apellido: " . ucfirst(mb_strtolower($inputForm["apellido"], "UTF-8"));
-    }
-
-    // Validar el DNI
-    if (validarNIF($inputForm['dni'])) {
-        $validaciones["correcto"][] = "DNI: " . $inputForm['dni'];
-    } else {
-        $validaciones["error"][] = "El DNI no es válido";
-    }
-
-    // Validar usuario en la base de datos
-    if (userExist(USUARIOS, $inputForm)) {
-        $validaciones["correcto"][] = "Usuario validado";
-    } else {
-        $validaciones["error"][] = "El usuario no se encuentra en la Base de Datos.";
-    }
-
-    // Validar la fecha
-    if (validarFecha($inputForm['fecha'])) {
-        $validaciones["correcto"][] = "Fecha: " . date("d-m-Y", strtotime($inputForm['fecha']));
-    } else {
-        $validaciones["error"][] = "La fecha debe ser posterior a la actual";
-    }
-
-    // Validar los días de reserva
-    if (validarDias($inputForm['dias'])) {
-        $validaciones["correcto"][] = "Días: " . $inputForm['dias'];
-    } else {
-        $validaciones["error"][] = "Lo días de reserva debe ser un número entre el 1 y el 30.";
-    }
-
-    // Validar disponibilidad del vehículo
-    if (validarFecha($inputForm['fecha']) && validarDias($inputForm['dias'])) {
-        if (validarCocheLibre($coches, $inputForm)) {
-            $validaciones["correcto"][] = "Vehículo disponible.";
-        } else {
-            $validaciones["error"][] = "El vehículo no se encuentra disponible para esas fechas.";
-        }
-    }
-
-    return $validaciones;
-}
-
-/**
  * Devuelve en nombre del modelo correspondiente
  * al ID dado.
  *
@@ -214,43 +152,80 @@ function encontrarModeloPorID($id, $coches): string
 }
 
 /**
- * Pinta en pantalla las validaciones (correctas y erroneas)
- * @param  array $validaciones array asociativo multidimensiona
- * @return void
+ * Devuelve un array multidimensional con las validaciones
+ * necesarias (correctas y erroneas).
+ * @param  array $coches
+ * @param  array $inputForm
  */
-function pintarReservaNoValida($validaciones): void
+function validarReserva($coches, $inputForm): void
 {
-    echo "<h2>Reserva no válida</h2>";
-    foreach ($validaciones as $tipoValidacion => $validacion) {
-        $colorMensaje = $tipoValidacion === "error" ? "error" : "correcto";
-        echo "<ul>";
-        foreach ($validacion as $mensaje) {
-            echo "<li class='{$colorMensaje}'>{$mensaje}</li>";
+    $valido = [];
+    $error = [];
+
+    // Validar el nombre
+    if (empty($inputForm['nombre'])) {
+        $error["Nombre"] = "El campo no puede estar vácio.";
+    } else {
+        $valido["Nombre"] = ucfirst(mb_strtolower($inputForm["nombre"], "UTF-8"));
+    }
+
+    // Validar el apellido
+    if (empty($inputForm['apellido'])) {
+        $error["Apellido"] = "El campo no puede estar vácio.";
+    } else {
+        $valido["Apellido"] = ucfirst(mb_strtolower($inputForm["apellido"], "UTF-8"));
+    }
+
+    // Validar el DNI
+    if (validarNIF($inputForm['dni'])) {
+        $valido["DNI"] = $inputForm['dni'];
+    } else {
+        $error["DNI"] = "No es válido.";
+    }
+
+    // Validar usuario en la base de datos
+    if (userExist(USUARIOS, $inputForm)) {
+        $valido["Usuario"] = "Se encuentra en la base de datos.";
+    } else {
+        $error["Usuario"] = "No se encuentra en la base de datos.";
+    }
+
+    // Validar la fecha
+    if (validarFecha($inputForm['fecha'])) {
+        $valido["Fecha"] = date("d-m-Y", strtotime($inputForm['fecha']));
+    } else {
+        $error["Fecha"] = "Debe ser posterior a la actual.";
+    }
+
+    // Validar los días de reserva
+    if (validarDias($inputForm['dias'])) {
+        $valido["Días"] = $inputForm['dias'];
+    } else {
+        $error["Días"] = "Lo días de reserva debe ser un número entre el 1 y el 30.";
+    }
+
+    // Validar disponibilidad del vehículo
+    if (validarFecha($inputForm['fecha']) && validarDias($inputForm['dias'])) {
+        if (validarCocheLibre($coches, $inputForm)) {
+            $valido["Vehículo"] = "Disponible.";
+        } else {
+            $error["Vehículo"] = "No se encuentra disponible para esas fechas.";
         }
-        echo "</ul>";
+    }
+
+    $_SESSION['valido'] = $valido;
+    $_SESSION['error'] = $error;
+
+    // si no hay errores redirigimos a la página de reserva OK:
+    if (count($error) != 0) {
+        header("Location: reservaNOK.php");
+        exit;
+    } else {
+        $_SESSION['vehiculo']['id'] = $inputForm['idVehiculo'];
+        $_SESSION['vehiculo']['modelo'] = encontrarModeloPorID($inputForm['idVehiculo'], $coches);
+        header("Location: reservaOK.php");
+        exit;
     }
 }
 
-/**
- * Pinta en pantalla los datos de la reserva realizada
- *
- * @param array $inputForm
- * @param array $coches
- * @return void
- */
-function pintarReservaValida($inputForm, $coches): void
-{
-    $id = $inputForm["idVehiculo"];
-    $modelo = encontrarModeloPorID($id, $coches);
-    $nombre = ucfirst(mb_strtolower($inputForm["nombre"], "UTF-8"));
-    $apellido = ucfirst(mb_strtolower($inputForm["apellido"], "UTF-8"));
-    $extension = "png";
-
-    $pintar = "<div class='info-reserva'>";
-    $pintar .= "<h2>Reserva válida</h2>";
-    $pintar .= "<p>{$nombre} {$apellido}</p>";
-    $pintar .= "<img src='./img/{$id}.{$extension}' title='{$modelo}' alt='{$modelo}'>";
-    $pintar .= "</div>";
-
-    echo $pintar;
-}
+validarReserva($coches, $_POST);
