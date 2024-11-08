@@ -21,7 +21,7 @@
                 <p>Vehículo:
                     <select name="idVehiculo" id="vehiculo">
                         <?php
-                        include './db/usuarios_y_coches.php';
+                        require './db/usuarios_y_coches.php';
                         foreach ($coches as $coche) {
                             echo "<option value='{$coche["id"]}'>{$coche["modelo"]}</option>";
                         }
